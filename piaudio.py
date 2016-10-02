@@ -6,9 +6,48 @@ import time
 import scipy.signal as signal
 from multiprocessing import Process, Value, Lock
 import pygame
+import alsaaudio
 
 ratio = 1.0
 final = numpy.ones((1024,2))
+
+
+
+def play(device, f):    
+
+    print('%d channels, %d sampling rate\n' % (f.getnchannels(),
+                                               f.getframerate()))
+    print(f.getsampwidth())
+    # Set attributes
+    device.setchannels(f.getnchannels())
+    #device.setrate(f.getframerate())
+    device.setrate(44800)
+    # 8bit is unsigned in wav files
+    if f.getsampwidth() == 1:
+        device.setformat(alsaaudio.PCM_FORMAT_U8)
+    # Otherwise we assume signed data, little endian
+    elif f.getsampwidth() == 2:
+        device.setformat(alsaaudio.PCM_FORMAT_S16_LE)
+    elif f.getsampwidth() == 3:
+        device.setformat(alsaaudio.PCM_FORMAT_S24_LE)
+    elif f.getsampwidth() == 4:
+        device.setformat(alsaaudio.PCM_FORMAT_S32_LE)
+    else:
+        raise ValueError('Unsupported format')
+
+    device.setperiodsize(320)
+    
+    data = f.readframes(320)
+    while data:
+        # Read data from stdin
+        device.write(data)
+        data = f.readframes(320)
+
+
+
+
+
+
 def get_callback(waf):
     wf = waf
     def callback(in_data, frame_count, time_info, status):
@@ -16,11 +55,10 @@ def get_callback(waf):
         #print(wf)
         global ratio
         #wf = wave_form
-
-
-        #data = wf.readframes(frame_count)
+        data = wf.readframes(frame_count)
         #return (data, pyaudio.paContinue)
 
+        return
         round_data = (int)(frame_count*ratio)
 
         if round_data % 2 != 0:
@@ -35,14 +73,17 @@ def get_callback(waf):
         #    data = wf.readframes(round_data)
         result = numpy.fromstring(data, dtype=numpy.int16)
         #print(status)
-        print(result.size)
+        #print(result.size)
         if result.size != 0:
-
-            result = numpy.reshape(result, (result.size/2, 2))
-            #split data into seperate channels and resample
-            final[:, 0] = signal.resample(result[:, 0], 1024)
-            final[:, 1] = signal.resample(result[:, 1], 1024)
-            out_data = final.flatten().astype(numpy.int16).tostring()
+            if wf.getnchannels() == 2:
+                result = numpy.reshape(result, (result.size/2, 2))
+                #split data into seperate channels and resample
+                final[:, 0] = signal.resample(result[:, 0], 1024)
+                final[:, 1] = signal.resample(result[:, 1], 1024)
+                out_data = final.flatten().astype(numpy.int16).tostring()
+            elif wf.getnchannels() == 1:
+                print('doin one channel')
+                out_data = signal.resample(result, 1024).astype(numpy.int16).tostring()
             return (out_data, pyaudio.paContinue)
         else:
             print('no blue')
@@ -61,21 +102,43 @@ def audio_loop(file, p, proc_ratio, end, chunk_size, stop_proc):
     print ('bipandpap')
     print ('file is ' + str(file))
 
-    
+    device = alsaaudio.PCM(card=None)
+    f = wave.open('audio/Joust/music/classical.wav', 'rb')
+    play(device, f)
+    return
+
+    #pygame.mixer.init()
+    #effect = pygame.mixer.Sound('audio/Joust/sounds/cyan team win.wav')
+    #effect.play()
     while True:
-        p = pyaudio.PyAudio()
+        
         #wf = 1
+
+
+
+        
         wf = wave.open(str(file), 'rb')
+        data = wf.readframes(1024)
+        result = numpy.fromstring(data, dtype=numpy.int16)
+        result = numpy.reshape(result, (result.size/2, 2))
+        #print(result.shape)
+        snd_out = pygame.sndarray.make_sound(result)
+        snd_out.play()
+        continue
+
+
+
+
+        p = pyaudio.PyAudio()
+    
         #wf = wave.open('audio/Joust/sounds/cyan team win.wav', 'rb')
-        print (wf.getnchannels(), wf.getsampwidth(), wf.getframerate())
+        print (wf.getnchannels(), wf.getsampwidth(), wf.getframerate(), p.get_format_from_width(wf.getsampwidth()))
         #wf.rewind()
         stream = p.open(format=p.get_format_from_width(wf.getsampwidth()),
                         channels=wf.getnchannels(),
                         rate=wf.getframerate(),
                         output=True,
                         stream_callback=get_callback(wf))
-
-
 
 
         #stream.start_stream()
@@ -154,6 +217,37 @@ def audio_loop(file, p, proc_ratio, end, chunk_size, stop_proc):
 
 
 
+def audio_effect(file, p, proc_ratio, end, chunk_size, stop_proc):
+    wf = wave.open('audio/Joust/sounds/cyan team win.wav', 'rb')
+    CHUNK = 1024
+    # instantiate PyAudio (1)
+    p = pyaudio.PyAudio()
+
+    # open stream (2)
+    stream = p.open(format=p.get_format_from_width(wf.getsampwidth()),
+                    channels=wf.getnchannels(),
+                    rate=wf.getframerate(),
+                    output=True,
+                    frames_per_buffer = CHUNK)
+
+    # read data
+    data = wf.readframes(CHUNK)
+
+    # play stream (3)
+    while len(data) > 0:
+        stream.write(data)
+        data = wf.readframes(CHUNK)
+
+    # stop stream (4)
+    stream.stop_stream()
+    stream.close()
+
+    # close PyAudio (5)
+    p.terminate()
+
+    
+
+
 
 # Start audio in seperate process to be non-blocking
 class Audio:
@@ -182,10 +276,25 @@ class Audio:
 
         self.p = pyaudio.PyAudio()
 
+
+
+
+
+
     def start_audio_loop(self):
         print('starting audio loop')
 
         #audio_loop(self.file, self.p, self.ratio, self.end, self.chunk_size, self.stop_proc)
+
+        #pygame.mixer.init()
+        #pygame.mixer.init(47000, -16, 2, 4096)
+        #self.effect = pygame.mixer.Sound(self.file)
+        #self.effect.play()
+        #device = alsaaudio.PCM(card=None)
+        #f = wave.open('audio/Joust/music/classical.wav', 'rb')
+        #self.play(device, f)
+
+
         self.proc = Process(target=audio_loop, args=(self.file, self.p, self.ratio, self.end, self.chunk_size, self.stop_proc))
         self.proc.start()
         
@@ -204,8 +313,15 @@ class Audio:
             self.chunk_size.value = int(2048/2)
 
     def start_effect(self):
+        #self.proc = Process(target=audio_effect, args=(self.file, self.p, self.ratio, self.end, self.chunk_size, self.stop_proc))
+        #self.proc.start()
+        #pygame.mixer.init(47000, -16, 2, 4096)
         #self.effect = pygame.mixer.Sound(self.file)
         #self.effect.play()
+        device = alsaaudio.PCM(card=None)
+        f = wave.open(self.file, 'rb')
+        play(device, f)
+
         pass
 
     def stop_effect(self):

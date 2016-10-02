@@ -4,7 +4,7 @@ import pyaudio
 import wave
 import sys
 
-CHUNK = 4096
+CHUNK = 1024
 
 if len(sys.argv) < 2:
     print("Plays a wave file.\n\nUsage: %s filename.wav" % sys.argv[0])
@@ -16,10 +16,11 @@ wf = wave.open(sys.argv[1], 'rb')
 p = pyaudio.PyAudio()
 
 # open stream (2)
-stream = p.open(format=p.get_format_from_width(wf.getsampwidth()),
+stream = p.open(format=pyaudio.paInt16,
                 channels=wf.getnchannels(),
                 rate=wf.getframerate(),
-                output=True)
+                output=True,
+		frames_per_buffer = CHUNK)
 
 # read data
 data = wf.readframes(CHUNK)
