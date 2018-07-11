@@ -276,6 +276,11 @@ class Menu():
             self.commander_music = Music(random.choice(glob.glob("audio/Commander/music/*")))
         except Exception:
             self.commander_music = DummyMusic()
+        
+        if random.randint(0,1)==1:
+            self.fight_music = self.commander_music
+        else:
+            self.fight_music = self.joust_music
 
     def exclude_out_moves(self):
         for move in self.moves:
@@ -597,12 +602,23 @@ class Menu():
                 self.command_from_web = command
 
     def update_status(self,game_status):
+
+        joust_track = self.joust_music.get_title()
+        zombie_track = self.zombie_music.get_title()
+        commander_track = self.commander_music.get_title()
+        fight_track = self.fight_music.get_title()
+        menu_track = self.menu_music.get_title()
         self.ns.status ={
             'game_status' : game_status,
             'game_mode' : self.game_mode.pretty_name,
             'move_count' : self.move_count,
             'alive_count' : self.move_count - self.dead_count.value,
-            'ticker': self.i
+            'ticker': self.i,
+            'joust_track': joust_track,
+            'zombie_track': zombie_track,
+            'commander_track': menu_track,
+            'fight_track': fight_track,
+            'menu_track': menu_track
         }
 
         battery_status = {}
@@ -730,11 +746,7 @@ class Menu():
             swapper.Swapper(game_moves, self.command_queue, self.ns, self.joust_music)
             self.tracked_moves = {}
         elif self.game_mode == common.Games.FightClub:
-            if random.randint(0,1)==1:
-                fight_music = self.commander_music
-            else:
-                fight_music = self.joust_music
-            fight_club.Fight_club(game_moves, self.command_queue, self.ns, fight_music)
+            fight_club.Fight_club(game_moves, self.command_queue, self.ns, self.fight_music)
             self.tracked_moves = {}
         elif self.game_mode == common.Games.Tournament:
             tournament.Tournament(game_moves, self.command_queue, self.ns, self.joust_music)
