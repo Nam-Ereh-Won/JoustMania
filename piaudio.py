@@ -12,6 +12,7 @@ import pygame
 import alsaaudio
 import threading
 from pydub import AudioSegment
+import mutagen
 
 import common
 
@@ -118,10 +119,16 @@ class Audio:
 
 @functools.lru_cache(maxsize=16)
 class Music:
+    title = "Metadata Not Loaded"
     def __init__(self, fname):
         self.load_thread_ = threading.Thread(target=lambda: self.load_sample_(fname))
         self.load_thread_.start()
         self.transition_future_ = asyncio.Future()
+        try:
+            self.title = mutagen.File(fname, easy=True)['title'][0]
+            print("Metadata for "+self.title+" loaded")
+        except MutagenError:
+            print("Metadata loading failed for "+fname)
 
     def wait_for_sample_(self):
         if self.load_thread_:
@@ -157,6 +164,9 @@ class Music:
         self.t.join()
         self.transition_future_.cancel()
 
+    def get_title(self):
+        return self.title
+
     def change_ratio(self, ratio):
         self.ratio.value = ratio
 
@@ -178,6 +188,7 @@ class Music:
         return self.transition_future_
 
 class DummyMusic:
+    def get_title(self): return 'Dummy File'
     def start_audio_loop(self): pass
     def stop_audio(self): pass
     def change_ratio(self): pass
