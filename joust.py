@@ -231,6 +231,8 @@ class Joust():
         #self.update_status('starting')
 
         print("speed is {}".format(self.sensitivity))
+        global SLOW_MAX
+        global SLOW_WARNING
         global MID_MAX
         global MID_WARNING
         global FAST_MAX
@@ -432,7 +434,7 @@ class Joust():
         elif time.time() >= self.change_time + INTERVAL_CHANGE and self.currently_changing:
             self.music_speed.value = MID_MUSIC_SPEED if self.speed_up or self.speed_down else \
                                      (SLOW_MUSIC_SPEED if self.changing_high else FAST_MUSIC_SPEED)
-            self.speed_up =  not self.speed_up
+            self.speed_up =  not self.speed_up #need to change this line
             self.change_time = self.get_change_time(speed_up = self.speed_up, speed_down = self.speed_down)
             self.audio.change_ratio(self.music_speed.value)
             self.currently_changing = False
@@ -616,6 +618,7 @@ class Joust():
             self.music_speed.value = MID_MUSIC_SPEED
             self.audio.change_ratio(self.music_speed.value)
             self.speed_up = False
+            self.speed_down = False
         
         while self.running:
             #I think the loop is so fast that this causes 
@@ -647,7 +650,9 @@ class Joust():
     def update_status(self,game_status,winning_team=-1):
         data ={'game_status' : game_status,
                'game_mode' : self.game_mode.pretty_name,
-               'winning_team' : winning_team}
+               'winning_team' : winning_team,
+               'current_track': self.audio.get_title()}
+        
         if self.game_mode == common.Games.JoustFFA or self.game_mode == common.Games.NonStop:
             data['total_players'] = len(self.move_serials)
             data['remaining_players'] = len([x[0] for x in self.dead_moves.items() if x[1].value==1])

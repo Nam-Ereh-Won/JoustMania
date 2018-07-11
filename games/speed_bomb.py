@@ -654,7 +654,8 @@ class Bomb():
                'game_mode' : 'Ninja',
                'winning_team' : winning_team,
                'total_players': len(self.move_serials),
-               'remaining_players': len(self.alive_moves)}
+               'remaining_players': len(self.alive_moves),
+               'current_track': self.audio.get_title()}
 
         self.ns.status = data
 

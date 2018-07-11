@@ -636,7 +636,8 @@ class Commander():
                'bravo_players': len(bravo_team),
                'bravo_alive': len(bravo_alive),
                'bravo_od_status': bravo_od_status,
-               'team_names' : ['Orange Team', 'Blue Team']}
+               'team_names' : ['Orange Team', 'Blue Team'],
+               'current_track': self.audio.get_title()}
 
         self.ns.status = data
 

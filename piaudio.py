@@ -128,12 +128,12 @@ class Music:
         self.transition_future_ = asyncio.Future()
         if not fname.endswith('.wav'):
             try:
-                self.title = mutagen.File(fname, easy=True)['title'][0]
+                self.title = str(mutagen.File(fname, easy=True)['title'][0])
                 print("Metadata for "+self.title+" loaded")
             except MutagenError:
                 print("Metadata loading failed for "+fname)
         else:
-            self.title = fname.split("/")[-1]
+            self.title = (os.path.splitext(fname)[0]).split("/")[-1]
             print("Title set to "+self.title)
 
     def wait_for_sample_(self):

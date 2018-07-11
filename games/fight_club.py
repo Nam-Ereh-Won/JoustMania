@@ -636,7 +636,8 @@ class Fight_club():
     def update_status(self,game_status,winning_team=-1):
         data ={'game_status' : game_status,
                'game_mode' : 'Fight Club',
-               'winning_team' : winning_team}
+               'winning_team' : winning_team,
+               'current_track': self.audio.get_title()}
         self.ns.status = data
                     
                 

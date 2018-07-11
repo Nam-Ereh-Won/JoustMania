@@ -432,7 +432,8 @@ class Swapper():
     def update_status(self,game_status,winning_team=-1):
         data ={'game_status' : game_status,
                'game_mode' : 'Swapper',
-               'winning_team' : winning_team}
+               'winning_team' : winning_team,
+               'current_track': self.audio.get_title()}
         team_total = [0,0]
         team_alive = [0,0]
         for move in self.move_serials:

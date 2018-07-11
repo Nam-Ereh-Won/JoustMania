@@ -419,6 +419,7 @@ class Menu():
                 self.play_menu_music = False
                 try:
                     self.menu_music = Music(random.choice(glob.glob("audio/MenuMusic/*")))
+                    self.track_title = self.menu_music.get_title()
                     self.menu_music.start_audio_loop()
                 except Exception:
                     self.menu_music = DummyMusic()
@@ -602,23 +603,13 @@ class Menu():
                 self.command_from_web = command
 
     def update_status(self,game_status):
-
-        joust_track = self.joust_music.get_title()
-        zombie_track = self.zombie_music.get_title()
-        commander_track = self.commander_music.get_title()
-        fight_track = self.fight_music.get_title()
-        menu_track = self.menu_music.get_title()
         self.ns.status ={
             'game_status' : game_status,
             'game_mode' : self.game_mode.pretty_name,
             'move_count' : self.move_count,
             'alive_count' : self.move_count - self.dead_count.value,
             'ticker': self.i,
-            'joust_track': joust_track,
-            'zombie_track': zombie_track,
-            'commander_track': menu_track,
-            'fight_track': fight_track,
-            'menu_track': menu_track
+            'current_track': self.track_title
         }
 
         battery_status = {}
@@ -704,7 +695,7 @@ class Menu():
             self.menu_music.stop_audio()
         except:
             pass
-        
+        self.track_title="None"
         self.update_status('starting')
 
         if random_mode:

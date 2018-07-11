@@ -447,7 +447,8 @@ class Zombie:
                'alive_zombies': len(self.alive_zombies),
                'ticker': self.update_time,
                'time_left': int(self.win_time - (time.time() - self.start_time)),
-               'team_names' : ['Humans', 'Zombies']}
+               'team_names' : ['Humans', 'Zombies'],
+               'current_track': self.audio.get_title()}
 
         self.ns.status = data
 
