@@ -9,26 +9,38 @@ function updateStatus(){
             info = JSON.parse(rawdata);
             $('.main_status').show()
             $('#game_mode').text(info.game_mode);
+			//these are left here for debug purposes
+            $('#joust_track').text(info.joust_track);
+            $('#zombie_track').text(info.zombie_track);
+            $('#commander_track').text(info.commander_track);
+            $('#fight_track').text(info.fight_track);
+            $('#menu_track').text(info.menu_track);
             $('.info_box').hide()
             $('.admin').hide()
             $('.error').hide()
-
+			$('#current_track').text(info.joust_track);
             if (info.game_status=='in_game'){
+				$('#current_track').text(info.joust_track);
                 $('#gamebuttons').show();
                 if (info.game_mode == 'Joust Free-for-All' || info.game_mode == 'Ninja'){
                     $('#free4all').show();
                     $('#total_players').text(info.total_players)
                     $('#remaining_players').text(info.remaining_players);
+					if(info.game_mode == 'Ninja'){
+						$('#current_track').text(info.commander_track);
+					}
                 } else if (info.game_mode == 'Tournament'){
                     $('#tournament').show()
                 } else if (info.game_mode == 'Zombies'){
+					$('#current_track').text(info.zombie_track);
                     $('#zombies').show()
                     $('#humans').text(info.humans)
                     $('#dead_zombies').text(info.dead_zombies)
                     $('#alive_zombies').text(info.alive_zombies)
                     $('#time_left').text(info.time_left)
                 } else if (info.game_mode == 'Commander'){
-                    $('#commander').show()
+                    $('#current_track').text(info.commander_track);
+					$('#commander').show()
                     $('#alpha_team').text(info.team_names[0] + ': ' + info.alpha_alive + '/'+ info.alpha_players)
                     $('#alpha_od_status').text(info.team_names[0] + ' Overdrive: ' +info.alpha_od_status)
                     $('#bravo_team').text(info.team_names[1] + ': ' + info.bravo_alive + '/'+ info.bravo_players)
@@ -36,6 +48,8 @@ function updateStatus(){
                 } else if (info.game_mode == 'Ninja Bomb'){
                     $('#ninja').show()
                     $('#total_ninjas').text(info.total_players)
+				} else if (info.game_mode == 'Fight Club'){
+                    $('#current_track').text(info.fight_track);
                 } else { //team mode without anything special
                     var team_info = '<br />';
                     if (info.game_mode == 'Werewolves'){//but then I jam a special line for werewolf in
@@ -72,6 +86,7 @@ function updateStatus(){
                 if (admin_menu == true){
                     $('.admin').show();
                 } else {
+					$('#current_track').text(info.menu_track);
                     $('#mainmenu').show();
                     $('#menubuttons').show();
                     $('#move_count').text(info.move_count);
@@ -115,12 +130,14 @@ $(document).ready(function(){
 
 {% block body %}
 <div class='main_status'>
-Curent mode: <span id='game_mode'>Joust Null</span><br />
+Current mode: <span id='game_mode'>Joust Null</span><br />
+Current track: <span id='current_track'>Song Null</span><br />
 </div>
 
 
 <div class='info_box' id='mainmenu'>
 <br />
+
 Connected Moves: <span id='move_count'>-999</span><br />
 Alive Moves: <span id='alive_count'>-999</span><br /><br />
 </div>
