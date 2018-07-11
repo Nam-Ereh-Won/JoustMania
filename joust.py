@@ -11,20 +11,25 @@ from multiprocessing import Process, Value, Array, Queue
 from math import sqrt
 
 
-# How fast/slow the music can go
+# How fast/mid the music can go
 SLOW_MUSIC_SPEED = 0.7
 #this was 0.5
+MID_MUSIC_SPEED = 1.0
 FAST_MUSIC_SPEED = 1.5
 
 # The min and max timeframe in seconds for
 # the speed change to trigger, randomly selected
 MIN_MUSIC_FAST_TIME = 4
 MAX_MUSIC_FAST_TIME = 8
+MIN_MUSIC_MID_TIME = 7
+MAX_MUSIC_MID_TIME = 16
 MIN_MUSIC_SLOW_TIME = 10
 MAX_MUSIC_SLOW_TIME = 23
 
 END_MIN_MUSIC_FAST_TIME = 6
 END_MAX_MUSIC_FAST_TIME = 10
+END_MIN_MUSIC_MID_TIME = 7
+END_MAX_MUSIC_MID_TIME = 11
 END_MIN_MUSIC_SLOW_TIME = 8
 END_MAX_MUSIC_SLOW_TIME = 12
 
@@ -32,12 +37,16 @@ END_MAX_MUSIC_SLOW_TIME = 12
 #These are changed from the options in common
 SLOW_MAX = 1
 SLOW_WARNING = 0.28
+MID_MAX = 1
+MID_WARNING = 0.28
 FAST_MAX = 1.8
 FAST_WARNING = 0.8
 
 #Sensitivity of the werewolf contollers
 WERE_SLOW_MAX = 1.4
 WERE_SLOW_WARNING = 0.5
+WERE_MID_MAX = 1.4
+WERE_MID_WARNING = 0.5
 WERE_FAST_MAX = 2.3
 WERE_FAST_WARNING = 1.2
 
@@ -101,13 +110,13 @@ def track_move(move_serial, move_num, game_mode, team, team_color_enum, dead_mov
                     change_arr[1] = change_arr[2]
                     change_arr[2] = change_real
                     change = (change_arr[0] + change_arr[1]+change_arr[2])/3
-                    speed_percent = (music_speed.value - SLOW_MUSIC_SPEED)/(FAST_MUSIC_SPEED - SLOW_MUSIC_SPEED)
+                    speed_percent = (music_speed.value - MID_MUSIC_SPEED)/(FAST_MUSIC_SPEED - MID_MUSIC_SPEED)
                     if werewolf:
-                        warning = common.lerp(WERE_SLOW_WARNING, WERE_FAST_WARNING, speed_percent)
-                        threshold = common.lerp(WERE_SLOW_MAX, WERE_FAST_MAX, speed_percent) 
+                        warning = common.lerp(WERE_MID_WARNING, WERE_FAST_WARNING, speed_percent)
+                        threshold = common.lerp(WERE_MID_MAX, WERE_FAST_MAX, speed_percent) 
                     else:
-                        warning = common.lerp(SLOW_WARNING, FAST_WARNING, speed_percent)
-                        threshold = common.lerp(SLOW_MAX, FAST_MAX, speed_percent)
+                        warning = common.lerp(MID_WARNING, FAST_WARNING, speed_percent)
+                        threshold = common.lerp(MID_MAX, FAST_MAX, speed_percent)
 
 
 
@@ -198,7 +207,7 @@ class Joust():
         self.move_serials = moves
         self.tracked_moves = {}
         self.dead_moves = {}
-        self.music_speed = Value('d', SLOW_MUSIC_SPEED)
+        self.music_speed = Value('d', MID_MUSIC_SPEED)
         self.running = True
         self.force_move_colors = {}
         self.teams = teams
@@ -222,21 +231,21 @@ class Joust():
         #self.update_status('starting')
 
         print("speed is {}".format(self.sensitivity))
-        global SLOW_MAX
-        global SLOW_WARNING
+        global MID_MAX
+        global MID_WARNING
         global FAST_MAX
         global FAST_WARNING
 
-        SLOW_MAX = common.SLOW_MAX[self.sensitivity]
-        SLOW_WARNING = common.SLOW_WARNING[self.sensitivity]
+        MID_MAX = common.MID_MAX[self.sensitivity]
+        MID_WARNING = common.MID_WARNING[self.sensitivity]
         FAST_MAX = common.FAST_MAX[self.sensitivity]
         FAST_WARNING = common.FAST_WARNING[self.sensitivity]
 
-        print("SLOWMAX IS {}".format(SLOW_MAX))
+        print("MIDMAX IS {}".format(MID_MAX))
 
         #Sensitivity of the werewolf contollers
-        WERE_SLOW_MAX = common.WERE_SLOW_MAX[self.sensitivity]
-        WERE_SLOW_WARNING = common.WERE_SLOW_WARNING[self.sensitivity]
+        WERE_MID_MAX = common.WERE_MID_MAX[self.sensitivity]
+        WERE_MID_WARNING = common.WERE_MID_WARNING[self.sensitivity]
         WERE_FAST_MAX = common.WERE_FAST_MAX[self.sensitivity]
         WERE_FAST_WARNING = common.WERE_FAST_WARNING[self.sensitivity]
         
@@ -292,6 +301,7 @@ class Joust():
         #self.change_time = self.get_change_time(speed_up = True)
         
         self.speed_up = False
+        self.speed_down = False
         self.currently_changing = False
         self.game_end = False
         self.winning_moves = []        
@@ -379,7 +389,7 @@ class Joust():
         if self.play_audio:
             self.start_game.start_effect()
 
-    def get_change_time(self, speed_up):
+    def get_change_time(self, speed_up, speed_down):
         min_moves = len(self.move_serials) - 2
         if min_moves <= 0:
             min_moves = 1
@@ -390,30 +400,36 @@ class Joust():
         min_music_fast = common.lerp(MIN_MUSIC_FAST_TIME, END_MIN_MUSIC_FAST_TIME, game_percent)
         max_music_fast = common.lerp(MAX_MUSIC_FAST_TIME, END_MAX_MUSIC_FAST_TIME, game_percent)
 
+        min_music_mid = common.lerp(MIN_MUSIC_MID_TIME, END_MIN_MUSIC_MID_TIME, game_percent)
+        max_music_mid = common.lerp(MAX_MUSIC_MID_TIME, END_MAX_MUSIC_MID_TIME, game_percent)
+
         min_music_slow = common.lerp(MIN_MUSIC_SLOW_TIME, END_MIN_MUSIC_SLOW_TIME, game_percent)
         max_music_slow = common.lerp(MAX_MUSIC_SLOW_TIME, END_MAX_MUSIC_SLOW_TIME, game_percent)
-        if speed_up:
-            added_time = random.uniform(min_music_fast, max_music_fast)
+        if speed_up == speed_down:
+            added_time = random.uniform(min_music_mid, max_music_mid)
         else:
-            added_time = random.uniform(min_music_slow, max_music_slow)
+            added_time = random.uniform(min_music_fast if self.changing_high else min_music_slow, \
+                                        max_music_fast if self.changing_high else max_music_slow)
         return time.time() + added_time
 
-    def change_music_speed(self, fast):
+    def change_music_speed(self, fast, slow):
         change_percent = numpy.clip((time.time() - self.change_time)/INTERVAL_CHANGE, 0, 1)
-        if fast:
-            self.music_speed.value = common.lerp(FAST_MUSIC_SPEED, SLOW_MUSIC_SPEED, change_percent)
-        elif not fast:
-            self.music_speed.value = common.lerp(SLOW_MUSIC_SPEED, FAST_MUSIC_SPEED, change_percent)
+        if fast or slow:
+            self.music_speed.value = common.lerp((FAST_MUSIC_SPEED if fast else SLOW_MUSIC_SPEED), MID_MUSIC_SPEED, change_percent)
+        else:
+            self.changing_high = bool(random.getrandbits(1))
+            self.music_speed.value = common.lerp(MID_MUSIC_SPEED, (FAST_MUSIC_SPEED if self.changing_high else SLOW_MUSIC_SPEED), change_percent)
         self.audio.change_ratio(self.music_speed.value)
 
     def check_music_speed(self):
         if time.time() > self.change_time and time.time() < self.change_time + INTERVAL_CHANGE:
-            self.change_music_speed(self.speed_up)
+            self.change_music_speed(self.speed_up, self.speed_down)
             self.currently_changing = True
         elif time.time() >= self.change_time + INTERVAL_CHANGE and self.currently_changing:
-            self.music_speed.value = SLOW_MUSIC_SPEED if self.speed_up else FAST_MUSIC_SPEED
+            self.music_speed.value = MID_MUSIC_SPEED if self.speed_up or self.speed_down else \
+                                     (SLOW_MUSIC_SPEED if self.changing_high else FAST_MUSIC_SPEED)
             self.speed_up =  not self.speed_up
-            self.change_time = self.get_change_time(speed_up = self.speed_up)
+            self.change_time = self.get_change_time(speed_up = self.speed_up, speed_down = self.speed_down)
             self.audio.change_ratio(self.music_speed.value)
             self.currently_changing = False
 
@@ -585,15 +601,15 @@ class Joust():
         time.sleep(0.02)
         if self.play_audio:
             self.audio.start_audio_loop()
-            self.audio.change_ratio(self.music_speed.value)
+            #self.audio.change_ratio(self.music_speed.value)
         else:
             #when no audio is playing set the music speed to middle speed
-            self.music_speed.value = (FAST_MUSIC_SPEED + SLOW_MUSIC_SPEED) / 2
+            self.music_speed.value = (FAST_MUSIC_SPEED + MID_MUSIC_SPEED) / 2
 
             
         time.sleep(0.8)
         if self.game_mode == common.Games.WereJoust:
-            self.music_speed.value = SLOW_MUSIC_SPEED
+            self.music_speed.value = MID_MUSIC_SPEED
             self.audio.change_ratio(self.music_speed.value)
             self.speed_up = False
         
@@ -687,12 +703,3 @@ class Joust():
                 bright = 10
 
         self.running = False
-                
-                
-        
-        
-
-            
-        
-
-            
