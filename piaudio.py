@@ -119,16 +119,22 @@ class Audio:
 
 @functools.lru_cache(maxsize=16)
 class Music:
-    title = "Metadata Not Loaded"
+    
     def __init__(self, fname):
+        print ("Attempting to init "+fname)
+        self.title = "Metadata Not Loaded"
         self.load_thread_ = threading.Thread(target=lambda: self.load_sample_(fname))
         self.load_thread_.start()
         self.transition_future_ = asyncio.Future()
-        try:
-            self.title = mutagen.File(fname, easy=True)['title'][0]
-            print("Metadata for "+self.title+" loaded")
-        except MutagenError:
-            print("Metadata loading failed for "+fname)
+        if not fname.endswith('.wav'):
+            try:
+                self.title = mutagen.File(fname, easy=True)['title'][0]
+                print("Metadata for "+self.title+" loaded")
+            except MutagenError:
+                print("Metadata loading failed for "+fname)
+        else:
+            self.title = fname.split("/")[-1]
+            print("Title set to "+self.title)
 
     def wait_for_sample_(self):
         if self.load_thread_:
