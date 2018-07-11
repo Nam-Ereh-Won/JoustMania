@@ -35,16 +35,16 @@ END_MAX_MUSIC_SLOW_TIME = 12
 
 #Default Sensitivity of the contollers
 #These are changed from the options in common
-SLOW_MAX = 1
-SLOW_WARNING = 0.28
+SLOW_MAX = 0.55
+SLOW_WARNING = 0.35
 MID_MAX = 1
 MID_WARNING = 0.28
 FAST_MAX = 1.8
 FAST_WARNING = 0.8
 
 #Sensitivity of the werewolf contollers
-WERE_SLOW_MAX = 1.4
-WERE_SLOW_WARNING = 0.5
+WERE_SLOW_MAX = .61
+WERE_SLOW_WARNING = .42
 WERE_MID_MAX = 1.4
 WERE_MID_WARNING = 0.5
 WERE_FAST_MAX = 2.3
