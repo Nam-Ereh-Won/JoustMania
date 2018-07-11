@@ -236,6 +236,8 @@ class Joust():
         global FAST_MAX
         global FAST_WARNING
 
+        SLOW_MAX = common.SLOW_MAX[self.sensitivity]
+        SLOW_WARNING = common.SLOW_WARNING[self.sensitivity]
         MID_MAX = common.MID_MAX[self.sensitivity]
         MID_WARNING = common.MID_WARNING[self.sensitivity]
         FAST_MAX = common.FAST_MAX[self.sensitivity]
@@ -244,6 +246,8 @@ class Joust():
         print("MIDMAX IS {}".format(MID_MAX))
 
         #Sensitivity of the werewolf contollers
+        WERE_SLOW_MAX = common.WERE_SLOW_MAX[self.sensitivity]
+        WERE_SLOW_WARNING = common.WERE_SLOW_WARNING[self.sensitivity]
         WERE_MID_MAX = common.WERE_MID_MAX[self.sensitivity]
         WERE_MID_WARNING = common.WERE_MID_WARNING[self.sensitivity]
         WERE_FAST_MAX = common.WERE_FAST_MAX[self.sensitivity]
