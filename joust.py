@@ -1,13 +1,11 @@
 import common, colors
 import psmove
 import time
-import psutil, os, glob
 import random
 import numpy
-import json
 from piaudio import Audio
 from enum import Enum
-from multiprocessing import Process, Value, Array, Queue
+from multiprocessing import Process, Value, Array
 from math import sqrt
 
 
@@ -556,12 +554,12 @@ class Joust():
                 team_win = Audio('audio/Joust/sounds/traitor win.wav')
             else:
                 if win_team_name == 'Pink':
-                    os.popen('espeak -ven -p 70 -a 200 "And the winner is ...Pink Team')
+                    #os.popen('espeak -ven -p 70 -a 200 "And the winner is ...Pink Team')
                     #team_win = Audio('audio/Joust/sounds/human win.wav')
                 if win_team_name == 'Magenta':
                     team_win = Audio('audio/Joust/sounds/magenta team win.wav')
                 if win_team_name == 'Orange':
-                    os.popen('espeak -ven -p 70 -a 200 "And the winner is ... Orange team"')
+                    #os.popen('espeak -ven -p 70 -a 200 "And the winner is ... Orange team"')
                     #team_win = Audio('audio/Joust/sounds/human win.wav')
                 if win_team_name == 'Yellow':
                     team_win = Audio('audio/Joust/sounds/yellow team win.wav')
@@ -572,7 +570,7 @@ class Joust():
                 if win_team_name == 'Blue':
                     team_win = Audio('audio/Joust/sounds/blue team win.wav')
                 if win_team_name == 'Purple':
-                    os.popen('espeak -ven -p 70 -a 200 "And the winner is ... Purple team"')
+                    #os.popen('espeak -ven -p 70 -a 200 "And the winner is ... Purple team"')
                     #team_win = Audio('audio/Joust/sounds/human win.wav')
             try:
                 team_win.start_effect()

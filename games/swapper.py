@@ -1,13 +1,11 @@
 import common, colors
 import psmove
 import time
-import psutil, os
 import random
 import numpy
-import json
 from piaudio import Audio
 from enum import Enum
-from multiprocessing import Process, Value, Array, Queue
+from multiprocessing import Process, Value, Array
 from math import sqrt
 
 

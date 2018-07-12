@@ -1,16 +1,12 @@
 import common, colors
 import psmove
 import time
-import psutil, os
 import random
 import numpy
-import math
-import json
 from piaudio import Audio
 from enum import Enum
 from multiprocessing import Process, Value, Array
 from math import sqrt
-from random import shuffle
 
 
 # How fast/slow the music can go
@@ -256,7 +252,7 @@ class Fight_club():
         
     def create_fighter_list(self):
         self.fighter_list = self.move_serials[:]
-        shuffle(self.fighter_list)
+        random.shuffle(self.fighter_list)
         
     def add_initial_score(self):
         for move in self.move_serials:

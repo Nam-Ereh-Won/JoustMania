@@ -1,13 +1,11 @@
 import common, colors
 import psmove
 import time
-import psutil, os
 import random
 import numpy
 from piaudio import Audio
 from enum import Enum
 from multiprocessing import Process, Value, Array
-import json
 
 
 #How long the winning moves shall sparkle

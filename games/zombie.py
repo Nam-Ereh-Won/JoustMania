@@ -2,10 +2,8 @@ import psmove
 import time
 import random
 import common, colors
-import os
 from multiprocessing import Process, Value, Array
 from piaudio import Audio
-import json
 from math import sqrt
 
 
