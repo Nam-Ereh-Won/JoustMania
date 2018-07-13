@@ -50,28 +50,29 @@ def lerp(a, b, p):
     return a*(1 - p) + b*p
 
 class Games(enum.Enum):
-    JoustFFA = (0, 'Joust Free-for-All', 2)
-    JoustTeams = (1, 'Joust Teams', 3)
-    JoustRandomTeams = (2, 'Joust Random Teams', 3)
-    Traitor = (3, 'Traitors', 6)
-    WereJoust = (4, 'Werewolves', 3)
-    Zombies = (5, 'Zombies', 4)
-    Commander = (6, 'Commander', 4)
-    Swapper = (7, 'Swapper', 3)
-    FightClub = (8, 'Fight Club', 2)
-    Tournament = (9, 'Tournament', 3)
-    NonStop = (10, 'Non Stop Joust', 2)
-    Ninja = (11, 'Ninja Bomb', 2)
-    Random = (12, 'Random', 2)
+    JoustFFA = (0, 'Joust Free-for-All', 2, 0)
+    JoustTeams = (1, 'Joust Teams', 3, 0)
+    JoustRandomTeams = (2, 'Joust Random Teams', 3, 0)
+    Traitor = (3, 'Traitors', 6, 0)
+    WereJoust = (4, 'Werewolves', 3, 2)
+    Zombies = (5, 'Zombies', 4, 2)
+    Commander = (6, 'Commander', 4, 2)
+    Swapper = (7, 'Swapper', 3, 2)
+    FightClub = (8, 'Fight Club', 2, 0)
+    Tournament = (9, 'Tournament', 3, 0)
+    NonStop = (10, 'Non Stop Joust', 2, 0)
+    Ninja = (11, 'Ninja Bomb', 2, 0)
+    Random = (12, 'Random', 2, 0)
 
 
-    def __new__(cls, value, pretty_name, min_players):
+    def __new__(cls, value, pretty_name, min_players, num_teams):
         """This odd constructor lets us keep Foo.value as an integer, but also
            add some extra properties to each option."""
         obj = object.__new__(cls)
         obj._value_ = value
         obj.pretty_name = pretty_name
         obj.minimum_players = min_players
+		obj.num_teams = num_teams
         return obj
 
     def next(self):

@@ -126,7 +126,7 @@ class Player:
             yield ev
         self.previous_state_ = state
         # TODO: The moves need to be occasionally prodded to keep their leds lit.
-        # If we make the piparty loop async, move this logic in there as a task.
+        # If we make the joustmania loop async, move this logic in there as a task.
         self.move_.update_leds()
 
     def set_player_color(self, color: common.Color):

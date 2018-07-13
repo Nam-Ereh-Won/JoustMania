@@ -88,7 +88,7 @@ class FreeForAll:
             self.music.stop_audio()
             self.players.cancel_effects()
 
-    # TODO: Ideally, the main game loop in piparty.py should handle setting up async.
+    # TODO: Ideally, the main game loop in joustmania.py should handle setting up async.
     def run_loop(self):
         loop = asyncio.get_event_loop()
         loop.set_debug(True)

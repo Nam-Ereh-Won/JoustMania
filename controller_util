@@ -3,7 +3,7 @@
 import asyncio
 import psmove
 import player
-import piparty
+import joustmania
 import math
 
 
@@ -36,7 +36,7 @@ async def Loop(plr):
 
 
 def Main():
-    piparty.Menu.enable_bt_scanning()
+    joustmania.Menu.enable_bt_scanning()
     move = psmove.PSMove(0)
     move.enable_orientation(True)
     p1 = player.Player(move)
