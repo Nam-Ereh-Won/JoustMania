@@ -72,7 +72,7 @@ class Games(enum.Enum):
         obj._value_ = value
         obj.pretty_name = pretty_name
         obj.minimum_players = min_players
-		obj.num_teams = num_teams
+        obj.num_teams = num_teams
         return obj
 
     def next(self):

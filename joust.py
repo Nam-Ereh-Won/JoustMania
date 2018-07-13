@@ -554,11 +554,13 @@ class Joust():
                 team_win = Audio('audio/Joust/sounds/traitor win.wav')
             else:
                 if win_team_name == 'Pink':
+                    pass
                     #os.popen('espeak -ven -p 70 -a 200 "And the winner is ...Pink Team')
                     #team_win = Audio('audio/Joust/sounds/human win.wav')
                 if win_team_name == 'Magenta':
                     team_win = Audio('audio/Joust/sounds/magenta team win.wav')
                 if win_team_name == 'Orange':
+                    pass
                     #os.popen('espeak -ven -p 70 -a 200 "And the winner is ... Orange team"')
                     #team_win = Audio('audio/Joust/sounds/human win.wav')
                 if win_team_name == 'Yellow':
@@ -570,6 +572,7 @@ class Joust():
                 if win_team_name == 'Blue':
                     team_win = Audio('audio/Joust/sounds/blue team win.wav')
                 if win_team_name == 'Purple':
+                    pass
                     #os.popen('espeak -ven -p 70 -a 200 "And the winner is ... Purple team"')
                     #team_win = Audio('audio/Joust/sounds/human win.wav')
             try:
