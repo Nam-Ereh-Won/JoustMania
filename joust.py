@@ -108,13 +108,40 @@ def track_move(move_serial, move_num, game_mode, team, team_color_enum, dead_mov
                     change_arr[1] = change_arr[2]
                     change_arr[2] = change_real
                     change = (change_arr[0] + change_arr[1]+change_arr[2])/3
-                    speed_percent = (music_speed.value - MID_MUSIC_SPEED)/(FAST_MUSIC_SPEED - MID_MUSIC_SPEED)
-                    if werewolf:
-                        warning = common.lerp(WERE_MID_WARNING, WERE_FAST_WARNING, speed_percent)
-                        threshold = common.lerp(WERE_MID_MAX, WERE_FAST_MAX, speed_percent) 
+                    
+                    if music_speed.value < MID_MUSIC_SPEED:
+                        speed_max = MID_MUSIC_SPEED
+                        speed_min = SLOW_MUSIC_SPEED
+                        w_warn_max = WERE_MID_WARNING
+                        w_warn_min = WERE_SLOW_WARNING
+                        w_thresh_max = WERE_MID_MAX
+                        w_thresh_min = WERE_SLOW_MAX
+                        warn_max = MID_WARNING
+                        warn_min = SLOW_WARNING
+                        thresh_max = MID_MAX
+                        thresh_min = SLOW_MAX
                     else:
-                        warning = common.lerp(MID_WARNING, FAST_WARNING, speed_percent)
-                        threshold = common.lerp(MID_MAX, FAST_MAX, speed_percent)
+                        speed_max = FAST_MUSIC_SPEED
+                        speed_min = MID_MUSIC_SPEED
+                        w_warn_max = WERE_FAST_WARNING
+                        w_warn_min = WERE_MID_WARNING
+                        w_thresh_max = WERE_FAST_MAX
+                        w_thresh_min = WERE_MID_MAX
+                        warn_max = FAST_WARNING
+                        warn_min = MID_WARNING
+                        thresh_max = FAST_MAX
+                        thresh_min = MID_MAX
+                    
+                    #speed_percent = (music_speed.value - MID_MUSIC_SPEED)/(FAST_MUSIC_SPEED - MID_MUSIC_SPEED)
+                    speed_percent = (music_speed.value - speed_min)/(speed_max - speed_min)
+                    if werewolf:
+                        warning = common.lerp(w_warn_min, w_warn_max, speed_percent)
+                        threshold = common.lerp(w_thresh_min, w_thresh_max, speed_percent)
+                    else:
+                        #warning = common.lerp(MID_WARNING, FAST_WARNING, speed_percent)
+                        #threshold = common.lerp(MID_MAX, FAST_MAX, speed_percent)
+                        warning = common.lerp(warn_min, warn_max, speed_percent)
+                        threshold = common.lerp(thresh_min, thresh_max, speed_percent)
 
 
 
@@ -418,7 +445,7 @@ class Joust():
 
     def change_music_speed(self, fast, slow):
         change_percent = numpy.clip((time.time() - self.change_time)/INTERVAL_CHANGE, 0, 1)
-        if fast or slow:
+        if fast ^ slow:
             self.music_speed.value = common.lerp((FAST_MUSIC_SPEED if fast else SLOW_MUSIC_SPEED), MID_MUSIC_SPEED, change_percent)
         else:
             self.changing_high = bool(random.getrandbits(1))
